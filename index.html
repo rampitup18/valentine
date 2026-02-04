@@ -1,0 +1,1006 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>rutu will you be my valentine?</title>
+  <style>
+    :root{
+      --bg1:#ffd1dc;
+      --bg2:#ff7aa2;
+      --card:#ffffffcc;
+      --ink:#2a1c24;
+      --pink:#ff3b7a;
+      --pink2:#ff79a8;
+      --hot:#ff2d6d;
+      --shadow: 0 18px 60px rgba(0,0,0,.18);
+      --radius: 22px;
+      --pixel: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --ui: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family:var(--ui);
+      color:var(--ink);
+      /* FIX: allow scrolling so panels never get clipped */
+      overflow-x:hidden;
+      overflow-y:auto;
+      background:
+        radial-gradient(1200px 800px at 15% 10%, rgba(255,255,255,.8) 0%, transparent 55%),
+        radial-gradient(1200px 800px at 85% 15%, rgba(255,255,255,.75) 0%, transparent 55%),
+        linear-gradient(135deg,var(--bg1),var(--bg2));
+    }
+
+    /* floating hearts background */
+    .hearts{ position:fixed; inset:0; pointer-events:none; opacity:.30; filter: blur(.2px); }
+    .heart{
+      position:absolute; width:14px; height:14px;
+      background: var(--pink);
+      transform: rotate(45deg);
+      border-radius: 2px;
+      animation: floatUp linear infinite;
+      box-shadow: 0 10px 30px rgba(255,45,109,.25);
+    }
+    .heart:before,.heart:after{
+      content:""; position:absolute; width:14px; height:14px;
+      background: var(--pink); border-radius: 50%;
+    }
+    .heart:before{ left:-7px; top:0 }
+    .heart:after{ left:0; top:-7px }
+    @keyframes floatUp{
+      from{ transform: translateY(110vh) rotate(45deg); opacity:0 }
+      10%{opacity:.85}
+      to{ transform: translateY(-20vh) rotate(45deg); opacity:0 }
+    }
+
+    .wrap{
+      min-height:100vh;
+      display:grid;
+      place-items:center;
+      padding:24px;
+      position:relative;
+    }
+    .card{
+      width:min(920px, 94vw);
+      background:var(--card);
+      backdrop-filter: blur(10px);
+      border:1px solid rgba(255,255,255,.6);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:26px;
+      position:relative;
+      overflow:auto;          /* FIX: internal scroll if needed */
+      max-height: 92vh;       /* FIX: keeps it within view */
+    }
+    .card:before{
+      content:""; position:absolute; inset:-80px -80px auto auto;
+      width:260px;height:260px;
+      background: radial-gradient(circle at 30% 30%, rgba(255,45,109,.30), transparent 65%);
+      transform: rotate(18deg);
+    }
+
+    .ask{
+      display:grid;
+      gap:18px;
+      justify-items:center;
+      text-align:center;
+      padding:20px 12px 14px;
+    }
+    h1{
+      margin:0;
+      font-size: clamp(34px, 5vw, 56px);
+      letter-spacing: -1px;
+      line-height:1.05;
+      text-transform: lowercase;
+    }
+
+    .btnRow{
+      display:flex;
+      gap:14px;
+      flex-wrap:wrap;
+      justify-content:center;
+      align-items:center;
+      margin-top:6px;
+    }
+    .btn{
+      border:0;
+      padding:14px 22px;
+      border-radius: 999px;
+      font-weight: 800;
+      letter-spacing: .2px;
+      cursor:pointer;
+      box-shadow: 0 12px 26px rgba(0,0,0,.12);
+      transition: transform .12s ease, filter .12s ease;
+      will-change: transform;
+      user-select:none;
+    }
+    .btn:active{ transform: translateY(1px) scale(.98) }
+
+    .yes{ background: linear-gradient(135deg, var(--hot), var(--pink2)); color:white; }
+    .no{
+      background: rgba(255,255,255,.85);
+      color: var(--ink);
+      border: 1px solid rgba(255,45,109,.25);
+    }
+
+    /* Games area */
+    .games{ display:none; margin-top:18px; gap:14px; }
+    .gamesHeader{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      flex-wrap:wrap;
+    }
+    .subline{
+      font-family: var(--pixel);
+      font-size: 12px;
+      opacity:.86;
+      letter-spacing: .3px;
+    }
+    .pill{
+      display:inline-flex;
+      gap:10px;
+      align-items:center;
+      border:1px solid rgba(255,45,109,.18);
+      background: rgba(255,255,255,.70);
+      padding:10px 12px;
+      border-radius:999px;
+      font-family: var(--pixel);
+      font-size: 12px;
+      box-shadow: 0 10px 24px rgba(0,0,0,.07);
+      white-space:nowrap;
+    }
+
+    .tabs{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      padding:12px;
+      background: rgba(255,255,255,.65);
+      border: 1px solid rgba(255,45,109,.16);
+      border-radius: 18px;
+      box-shadow: 0 12px 26px rgba(0,0,0,.06);
+    }
+    .tab{
+      border:1px solid rgba(0,0,0,.08);
+      background:#fff;
+      padding:10px 12px;
+      border-radius:14px;
+      cursor:pointer;
+      font-family: var(--pixel);
+      font-size: 12px;
+      transition: transform .12s ease, filter .12s ease, border-color .12s ease;
+      user-select:none;
+    }
+    .tab:hover{ filter: brightness(0.98); transform: translateY(-1px); }
+    .tab.active{
+      border-color: rgba(255,45,109,.45);
+      box-shadow: 0 10px 22px rgba(255,45,109,.12);
+    }
+
+    /* FIX: stack everything vertically so nothing disappears */
+    .gameGrid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:14px;
+      align-items:start;
+    }
+
+    .panel{
+      background: rgba(255,255,255,.68);
+      border: 1px solid rgba(255,45,109,.16);
+      border-radius: 18px;
+      box-shadow: 0 12px 26px rgba(0,0,0,.06);
+      padding:14px;
+    }
+    .panel h2{
+      margin:0 0 8px;
+      font-family: var(--pixel);
+      font-size: 12px;
+      letter-spacing:.5px;
+      text-transform: uppercase;
+      opacity:.9;
+    }
+    .help{
+      margin:0;
+      font-size: 13px;
+      opacity:.85;
+      line-height: 1.35;
+    }
+    .help code{
+      font-family: var(--pixel);
+      background: rgba(255,45,109,.10);
+      padding: 2px 6px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,45,109,.14);
+    }
+
+    .canvasWrap{ display:grid; gap:10px; justify-items:center; }
+    canvas{
+      width: min(820px, 92vw);
+      max-width: 100%;
+      aspect-ratio: 4 / 3;
+      border-radius: 16px;
+      border: 1px solid rgba(255,45,109,.22);
+      background: rgba(255,255,255,.60);
+      box-shadow: 0 18px 40px rgba(0,0,0,.10);
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+    }
+    .hudRow{
+      width: min(820px, 92vw);
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      font-family: var(--pixel);
+      font-size: 12px;
+    }
+    .hud{
+      padding:8px 10px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,45,109,.16);
+      background: rgba(255,255,255,.65);
+      box-shadow: 0 10px 22px rgba(0,0,0,.06);
+    }
+    .miniBtn{
+      border:1px solid rgba(255,45,109,.18);
+      background:#fff;
+      border-radius: 14px;
+      padding: 8px 10px;
+      cursor:pointer;
+      font-family: var(--pixel);
+      font-size: 12px;
+      box-shadow: 0 10px 22px rgba(0,0,0,.06);
+    }
+    .miniBtn:hover{ filter: brightness(.985); }
+    .divider{ height:1px; background: rgba(255,45,109,.14); margin: 12px 0 10px; }
+  </style>
+</head>
+<body>
+  <div class="hearts" id="hearts"></div>
+
+  <div class="wrap">
+    <div class="card">
+      <section class="ask" id="askScreen">
+        <h1>rutu will you be my valentine?</h1>
+        <div class="btnRow">
+          <button class="btn yes" id="yesBtn" aria-label="Yes">Yes</button>
+          <button class="btn no" id="noBtn" aria-label="No">No</button>
+        </div>
+      </section>
+
+      <section class="games" id="gamesScreen">
+        <div class="gamesHeader">
+          <div class="subline">choose a game</div>
+          <div class="pill">controls: keyboard · restart: R</div>
+        </div>
+
+        <div class="tabs" id="tabs"></div>
+
+        <div class="gameGrid">
+          <div class="panel">
+            <h2>play</h2>
+            <div class="canvasWrap">
+              <div class="hudRow">
+                <div class="hud" id="hudLeft">Game: <b>snake</b></div>
+                <div class="hud" id="hudRight">Score: <b>0</b> · Best: <b>0</b></div>
+                <button class="miniBtn" id="restartBtn">Restart</button>
+              </div>
+              <canvas id="c" width="320" height="240"></canvas>
+            </div>
+          </div>
+
+          <!-- FIX: controls panel is now BELOW the game, so it can’t disappear -->
+          <div class="panel">
+            <h2>controls</h2>
+            <p class="help" id="helpText"></p>
+            <div class="divider"></div>
+            <p class="help"><code>R</code> restarts the current game.</p>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+<script>
+/* hearts bg */
+(function makeHearts(){
+  const root = document.getElementById('hearts');
+  const count = 22;
+  for(let i=0;i<count;i++){
+    const h = document.createElement('div');
+    h.className = 'heart';
+    h.style.left = (Math.random()*100) + 'vw';
+    h.style.animationDelay = (Math.random()*8) + 's';
+    h.style.animationDuration = (9 + Math.random()*10) + 's';
+    const size = 8 + Math.random()*16;
+    h.style.width = size + 'px';
+    h.style.height = size + 'px';
+    h.style.opacity = 0.22 + Math.random()*0.55;
+    root.appendChild(h);
+  }
+})();
+
+/* ask screen behavior */
+const yesBtn = document.getElementById('yesBtn');
+const noBtn  = document.getElementById('noBtn');
+const askScreen = document.getElementById('askScreen');
+const gamesScreen = document.getElementById('gamesScreen');
+
+let yesScale = 1;
+let noScale  = 1;
+
+function applyScales(){
+  yesBtn.style.transform = `scale(${yesScale})`;
+  noBtn.style.transform  = `scale(${noScale})`;
+}
+
+noBtn.addEventListener('click', () => {
+  noScale  *= 0.85;
+  yesScale *= 1.12;
+  noScale  = Math.max(noScale, 0.22);
+  yesScale = Math.min(yesScale, 2.2);
+  applyScales();
+});
+
+yesBtn.addEventListener('click', () => {
+  askScreen.style.display = 'none';
+  gamesScreen.style.display = 'grid';
+  startArcade();
+});
+
+/* pixel arcade engine */
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+
+const hudLeft  = document.getElementById('hudLeft');
+const hudRight = document.getElementById('hudRight');
+const helpText = document.getElementById('helpText');
+const tabsEl   = document.getElementById('tabs');
+const restartBtn = document.getElementById('restartBtn');
+
+const W = canvas.width, H = canvas.height;
+
+/* palette */
+const P = {
+  bg:'#fff1f6', bg2:'#ffd1e3',
+  line:'rgba(255,45,109,.22)',
+  hot:'#ff2d6d', pink:'#ff3b7a', soft:'#ff79a8',
+  ink:'#3a0f22'
+};
+
+const clamp = (v,a,b)=>Math.max(a,Math.min(b,v));
+const rint = (a,b)=>Math.floor(a + Math.random()*(b-a+1));
+const choice = arr => arr[Math.floor(Math.random()*arr.length)];
+
+function clearBG(){
+  ctx.fillStyle = P.bg;
+  ctx.fillRect(0,0,W,H);
+  ctx.fillStyle = P.bg2;
+  for(let y=0;y<H;y+=8){
+    ctx.globalAlpha = 0.16;
+    ctx.fillRect(0,y,W,4);
+  }
+  ctx.globalAlpha = 1;
+  ctx.strokeStyle = P.line;
+  ctx.lineWidth = 2;
+  ctx.strokeRect(1,1,W-2,H-2);
+}
+
+function pixelText(str, x, y, size=10, color=P.ink){
+  ctx.fillStyle = color;
+  ctx.font = `${size}px ${getComputedStyle(document.documentElement).getPropertyValue('--pixel')}`;
+  ctx.textBaseline = 'top';
+  ctx.fillText(str, x, y);
+}
+
+function drawHeart(x,y,s=6,color=P.hot){
+  ctx.fillStyle = color;
+  const px = (dx,dy)=>ctx.fillRect(x+dx*s, y+dy*s, s, s);
+  px(1,0); px(2,0); px(4,0); px(5,0);
+  px(0,1); px(1,1); px(2,1); px(3,1); px(4,1); px(5,1); px(6,1);
+  px(0,2); px(1,2); px(2,2); px(3,2); px(4,2); px(5,2); px(6,2);
+  px(1,3); px(2,3); px(3,3); px(4,3); px(5,3);
+  px(2,4); px(3,4); px(4,4);
+  px(3,5);
+}
+
+/* no sounds */
+function beep(){}
+
+/* games */
+const Games = {};
+
+/* snake (snake) */
+Games.snake = {
+  id:'snake',
+  name:'snake',
+  help:`Arrow Keys / WASD to move. Eat hearts. Avoid walls and yourself.`,
+  best: 0,
+  init(){
+    this.grid = { cols: 20, rows: 15, size: 12 };
+    this.dir = {x:1,y:0};
+    this.nextDir = {x:1,y:0};
+    this.snake = [{x:10,y:7},{x:9,y:7},{x:8,y:7}];
+    this.spawnFood();
+    this.score = 0;
+    this.dead = false;
+    this.acc = 0;
+    this.stepMs = 95;
+  },
+  spawnFood(){
+    while(true){
+      const fx = rint(0,this.grid.cols-1);
+      const fy = rint(0,this.grid.rows-1);
+      if(!this.snake.some(s=>s.x===fx && s.y===fy)){
+        this.food = {x:fx,y:fy};
+        return;
+      }
+    }
+  },
+  onKey(e){
+    const k = e.key.toLowerCase();
+    const set = (x,y)=>{
+      if(this.dir.x === -x && this.dir.y === -y) return;
+      this.nextDir = {x,y};
+    };
+    if(k==='arrowup'||k==='w') set(0,-1);
+    if(k==='arrowdown'||k==='s') set(0,1);
+    if(k==='arrowleft'||k==='a') set(-1,0);
+    if(k==='arrowright'||k==='d') set(1,0);
+  },
+  tick(dt){
+    if(this.dead) return;
+    this.acc += dt*1000;
+    while(this.acc >= this.stepMs){
+      this.acc -= this.stepMs;
+      this.dir = this.nextDir;
+      const head = this.snake[0];
+      const nx = head.x + this.dir.x;
+      const ny = head.y + this.dir.y;
+
+      if(nx<0||ny<0||nx>=this.grid.cols||ny>=this.grid.rows){ this.dead=true; return; }
+      if(this.snake.some((s,i)=>i!==0 && s.x===nx && s.y===ny)){ this.dead=true; return; }
+
+      this.snake.unshift({x:nx,y:ny});
+      const ate = (nx===this.food.x && ny===this.food.y);
+      if(ate){ this.score += 10; this.spawnFood(); }
+      else{ this.snake.pop(); }
+    }
+  },
+  draw(){
+    clearBG();
+    const {cols,rows,size} = this.grid;
+    const ox = Math.floor((W - cols*size)/2);
+    const oy = 24;
+
+    ctx.strokeStyle = 'rgba(255,45,109,.18)';
+    ctx.strokeRect(ox-2, oy-2, cols*size+4, rows*size+4);
+
+    drawHeart(ox + this.food.x*size - 4, oy + this.food.y*size - 2, 2, P.hot);
+
+    for(let i=0;i<this.snake.length;i++){
+      const s = this.snake[i];
+      ctx.fillStyle = i===0 ? P.hot : (i%2?P.pink:P.soft);
+      ctx.fillRect(ox + s.x*size, oy + s.y*size, size, size);
+    }
+
+    if(this.dead){
+      ctx.fillStyle = 'rgba(255,255,255,.84)';
+      ctx.fillRect(54, 90, W-108, 60);
+      ctx.strokeStyle = P.line;
+      ctx.strokeRect(54, 90, W-108, 60);
+      pixelText('game over', 108, 114, 14, P.ink);
+      pixelText('press R', 108, 132, 12, P.ink);
+    }
+  }
+};
+
+/* Breakout */
+Games.breakout = {
+  id:'breakout',
+  name:'Breakout',
+  help:`Left/Right or A/D. Break the blocks. Don’t drop the ball.`,
+  best: 0,
+  init(){
+    this.score = 0;
+    this.dead = false;
+    this.won = false;
+
+    this.paddle = { w:54, h:8, x: (W-54)/2, y: H-22, vx:0 };
+    this.ball = { x: W/2, y: H-40, vx: 120, vy: -140, r: 4 };
+
+    const rows=5, cols=10;
+    this.bricks=[];
+    const pad=10, top=32;
+    const bw = (W - pad*2 - (cols-1)*4)/cols;
+    const bh = 10;
+    for(let r=0;r<rows;r++){
+      for(let c=0;c<cols;c++){
+        this.bricks.push({ x: pad + c*(bw+4), y: top + r*(bh+4), w:bw, h:bh, alive:true, hp: r<2 ? 2 : 1 });
+      }
+    }
+    this.keys = {left:false,right:false};
+  },
+  onKey(e,down=true){
+    const k=e.key.toLowerCase();
+    if(k==='arrowleft'||k==='a') this.keys.left = down;
+    if(k==='arrowright'||k==='d') this.keys.right = down;
+  },
+  tick(dt){
+    if(this.dead||this.won) return;
+    const p=this.paddle, b=this.ball;
+
+    const speed = 200;
+    p.vx = (this.keys.left?-speed:0) + (this.keys.right?speed:0);
+    p.x = clamp(p.x + p.vx*dt, 8, W-8-p.w);
+
+    b.x += b.vx*dt;
+    b.y += b.vy*dt;
+
+    if(b.x-b.r<2){ b.x=b.r+2; b.vx*=-1; }
+    if(b.x+b.r>W-2){ b.x=W-b.r-2; b.vx*=-1; }
+    if(b.y-b.r<2){ b.y=b.r+2; b.vy*=-1; }
+    if(b.y-b.r>H){ this.dead=true; return; }
+
+    if(b.y+b.r >= p.y && b.y-b.r <= p.y+p.h && b.x>=p.x && b.x<=p.x+p.w && b.vy>0){
+      b.y = p.y - b.r;
+      b.vy *= -1;
+      const t = ((b.x - p.x) / p.w) * 2 - 1;
+      b.vx = 160 * t;
+    }
+
+    let aliveCount=0;
+    for(const br of this.bricks){
+      if(!br.alive) continue;
+      aliveCount++;
+      if(b.x+b.r>br.x && b.x-b.r<br.x+br.w && b.y+b.r>br.y && b.y-b.r<br.y+br.h){
+        br.hp -= 1;
+        if(br.hp<=0){ br.alive=false; this.score += 10; }
+        else { this.score += 3; }
+
+        const ox = Math.min(b.x+b.r - br.x, br.x+br.w - (b.x-b.r));
+        const oy = Math.min(b.y+b.r - br.y, br.y+br.h - (b.y-b.r));
+        if(ox < oy) b.vx *= -1; else b.vy *= -1;
+        break;
+      }
+    }
+    if(aliveCount===0){ this.won=true; }
+  },
+  draw(){
+    clearBG();
+    for(const br of this.bricks){
+      if(!br.alive) continue;
+      ctx.fillStyle = br.hp===2 ? P.hot : P.soft;
+      ctx.fillRect(br.x, br.y, br.w, br.h);
+      ctx.strokeStyle = 'rgba(58,15,34,.07)';
+      ctx.strokeRect(br.x+0.5, br.y+0.5, br.w-1, br.h-1);
+    }
+
+    ctx.fillStyle = P.hot;
+    ctx.fillRect(this.paddle.x, this.paddle.y, this.paddle.w, this.paddle.h);
+
+    ctx.fillStyle = P.ink;
+    ctx.fillRect(this.ball.x-this.ball.r, this.ball.y-this.ball.r, this.ball.r*2, this.ball.r*2);
+
+    if(this.dead||this.won){
+      ctx.fillStyle = 'rgba(255,255,255,.84)';
+      ctx.fillRect(54, 90, W-108, 60);
+      ctx.strokeStyle = P.line;
+      ctx.strokeRect(54, 90, W-108, 60);
+      pixelText(this.won ? 'cleared' : 'missed', 108, 114, 14, P.ink);
+      pixelText('press R', 108, 132, 12, P.ink);
+    }
+  }
+};
+
+/* Pong */
+Games.pong = {
+  id:'pong',
+  name:'Pong',
+  help:`W/S or Up/Down. First to 7.`,
+  best: 0,
+  init(){
+    this.left = {x:14,y:H/2-18,w:6,h:36,vy:0,score:0};
+    this.right= {x:W-20,y:H/2-18,w:6,h:36,score:0};
+    this.ball = {x:W/2,y:H/2,vx:140*(Math.random()<.5?-1:1),vy:rint(-90,90),r:3};
+    this.keys={up:false,down:false};
+    this.over=false;
+  },
+  onKey(e,down=true){
+    const k=e.key.toLowerCase();
+    if(k==='arrowup'||k==='w') this.keys.up = down;
+    if(k==='arrowdown'||k==='s') this.keys.down = down;
+  },
+  tick(dt){
+    if(this.over) return;
+
+    const L=this.left, R=this.right, B=this.ball;
+    const sp=200;
+    L.vy = (this.keys.up?-sp:0) + (this.keys.down?sp:0);
+    L.y = clamp(L.y + L.vy*dt, 6, H-6-L.h);
+
+    const ai = 170;
+    const target = B.y - R.h/2;
+    R.y += clamp(target - R.y, -ai*dt, ai*dt);
+    R.y = clamp(R.y, 6, H-6-R.h);
+
+    B.x += B.vx*dt; B.y += B.vy*dt;
+
+    if(B.y-B.r<2){ B.y=B.r+2; B.vy*=-1; }
+    if(B.y+B.r>H-2){ B.y=H-B.r-2; B.vy*=-1; }
+
+    const hit = (Pdl)=>{
+      if(B.x+B.r>Pdl.x && B.x-B.r<Pdl.x+Pdl.w && B.y+B.r>Pdl.y && B.y-B.r<Pdl.y+Pdl.h){
+        if(B.vx<0) B.x = Pdl.x+Pdl.w+B.r; else B.x = Pdl.x-B.r;
+        B.vx *= -1;
+        const t = ((B.y - Pdl.y) / Pdl.h) * 2 - 1;
+        B.vy = 160 * t;
+      }
+    };
+    hit(L); hit(R);
+
+    if(B.x < -10){ R.score++; this.resetBall(-1); }
+    if(B.x > W+10){ L.score++; this.resetBall(1); }
+    if(L.score>=7 || R.score>=7){ this.over=true; }
+  },
+  resetBall(dir){
+    this.ball.x=W/2; this.ball.y=H/2;
+    this.ball.vx = 140*dir;
+    this.ball.vy = rint(-90,90);
+  },
+  draw(){
+    clearBG();
+    ctx.fillStyle = 'rgba(255,45,109,.22)';
+    for(let y=26;y<H-10;y+=10) ctx.fillRect(W/2-1, y, 2, 6);
+
+    ctx.fillStyle = P.hot;
+    ctx.fillRect(this.left.x, this.left.y, this.left.w, this.left.h);
+    ctx.fillRect(this.right.x, this.right.y, this.right.w, this.right.h);
+
+    ctx.fillStyle = P.ink;
+    ctx.fillRect(this.ball.x-this.ball.r, this.ball.y-this.ball.r, this.ball.r*2, this.ball.r*2);
+
+    pixelText(`${this.left.score}`, W/2-40, 28, 16, P.ink);
+    pixelText(`${this.right.score}`, W/2+28, 28, 16, P.ink);
+
+    if(this.over){
+      ctx.fillStyle = 'rgba(255,255,255,.84)';
+      ctx.fillRect(54, 90, W-108, 60);
+      ctx.strokeStyle = P.line;
+      ctx.strokeRect(54, 90, W-108, 60);
+      pixelText('press R', 108, 114, 14, P.ink);
+    }
+  }
+};
+
+/* Space Invaders (simple) — drop-in replacement for your Games.invaders block */
+Games.invaders = {
+  id: 'invaders',
+  name: 'Space Invaders',
+  help: `Left/Right or A/D. Space to shoot. Don’t let blocks reach you.`,
+  best: 0,
+
+  init() {
+    this.score = 0;
+    this.dead = false;
+
+    this.player = { x: W / 2 - 8, y: H - 24, w: 16, h: 10, vx: 0, cool: 0 };
+    this.bullets = [];
+    this.enemies = [];
+    this.spawnT = 0;
+
+    this.keys = { left: false, right: false, fire: false };
+  },
+
+  // IMPORTANT: preventDefault for Space so it doesn't "click" the focused Restart button
+  onKey(e, down = true) {
+    const k = (e.key || '').toLowerCase();
+
+    if (k === 'arrowleft' || k === 'a') this.keys.left = down;
+    if (k === 'arrowright' || k === 'd') this.keys.right = down;
+
+    // Spacebar can come through as e.key === ' ' or e.code === 'Space'
+    const isSpace = (e.code === 'Space') || (e.key === ' ');
+    if (isSpace) {
+      e.preventDefault();
+      e.stopPropagation();
+      this.keys.fire = down;
+    }
+  },
+
+  tick(dt) {
+    if (this.dead) return;
+
+    // player move
+    const p = this.player;
+    const sp = 220;
+    p.vx = (this.keys.left ? -sp : 0) + (this.keys.right ? sp : 0);
+    p.x = clamp(p.x + p.vx * dt, 6, W - 6 - p.w);
+
+    // shooting
+    p.cool -= dt;
+    if (this.keys.fire && p.cool <= 0) {
+      this.bullets.push({ x: p.x + p.w / 2 - 1, y: p.y - 2, w: 2, h: 4, vy: -320 });
+      p.cool = 0.16;
+    }
+
+    // bullets update
+    for (const b of this.bullets) b.y += b.vy * dt;
+    this.bullets = this.bullets.filter(b => b.y > -10);
+
+    // spawn enemies
+    this.spawnT += dt;
+    const rate = Math.max(0.45, 1.2 - this.score / 250);
+    if (this.spawnT >= rate) {
+      this.spawnT = 0;
+      const w = choice([10, 12, 14]);
+      this.enemies.push({
+        x: rint(10, W - 10 - w),
+        y: -12,
+        w,
+        h: 10,
+        vy: 60 + Math.min(140, this.score * 0.2),
+        hp: w === 14 ? 2 : 1
+      });
+    }
+
+    // enemies move
+    for (const e of this.enemies) e.y += e.vy * dt;
+
+    // collisions + lose conditions
+    for (const e of this.enemies) {
+      // bullet hits
+      for (const b of this.bullets) {
+        if (b.x < e.x + e.w && b.x + b.w > e.x && b.y + b.h > e.y && b.y < e.y + e.h) {
+          e.hp -= 1;
+          b.y = -9999; // remove bullet
+          if (e.hp <= 0) {
+            e.y = 9999; // remove enemy
+            this.score += 12;
+          } else {
+            this.score += 4;
+          }
+          break;
+        }
+      }
+
+      // enemy hits player
+      if (e.y + e.h >= p.y && e.x < p.x + p.w && e.x + e.w > p.x) {
+        this.dead = true;
+        break;
+      }
+
+      // enemy reaches bottom
+      if (e.y > H + 8) {
+        this.dead = true;
+        break;
+      }
+    }
+
+    // cleanup
+    this.bullets = this.bullets.filter(b => b.y > -100);
+    this.enemies = this.enemies.filter(e => e.y < 500);
+  },
+
+  draw() {
+    clearBG();
+
+    // player
+    ctx.fillStyle = P.hot;
+    ctx.fillRect(this.player.x, this.player.y, this.player.w, this.player.h);
+
+    // bullets
+    ctx.fillStyle = P.ink;
+    for (const b of this.bullets) ctx.fillRect(b.x, b.y, b.w, b.h);
+
+    // enemies
+    for (const e of this.enemies) {
+      ctx.fillStyle = e.hp === 2 ? P.hot : P.soft;
+      ctx.fillRect(e.x, e.y, e.w, e.h);
+      ctx.strokeStyle = 'rgba(58,15,34,.07)';
+      ctx.strokeRect(e.x + 0.5, e.y + 0.5, e.w - 1, e.h - 1);
+    }
+
+    // overlay
+    if (this.dead) {
+      ctx.fillStyle = 'rgba(255,255,255,.84)';
+      ctx.fillRect(54, 90, W - 108, 60);
+      ctx.strokeStyle = P.line;
+      ctx.strokeRect(54, 90, W - 108, 60);
+      pixelText('game over', 108, 114, 14, P.ink);
+      pixelText('press R', 108, 132, 12, P.ink);
+    }
+  }
+};
+
+
+/* Flappy Bird */
+Games.flappy = {
+  id:'flappy',
+  name:'Flappy Bird',
+  help:`Space (or click) to jump. Pass through gaps.`,
+  best: 0,
+  init(){
+    this.score=0; this.dead=false;
+    this.player={x:70,y:H/2,vy:0};
+    this.gravity=520;
+    this.flap=-210;
+    this.pipes=[];
+    this.spawn=0;
+    this.gap=72;
+    this.speed=120;
+  },
+  onKey(e){
+    if(e.key===' '){
+      e.preventDefault();
+      if(!this.dead) this.player.vy = this.flap;
+    }
+  },
+  onClick(){
+    if(!this.dead) this.player.vy = this.flap;
+  },
+  tick(dt){
+    if(this.dead) return;
+
+    this.player.vy += this.gravity*dt;
+    this.player.y += this.player.vy*dt;
+
+    this.spawn += dt;
+    if(this.spawn >= 1.05){
+      this.spawn = 0;
+      const mid = rint(60, H-60);
+      this.pipes.push({x:W+10, mid, passed:false});
+    }
+
+    for(const p of this.pipes) p.x -= this.speed*dt;
+    this.pipes = this.pipes.filter(p=>p.x>-30);
+
+    const py=this.player.y, px=this.player.x;
+    if(py<10 || py>H-10){ this.dead=true; return; }
+
+    for(const p of this.pipes){
+      const w=22;
+      const topH = p.mid - this.gap/2;
+      const botY = p.mid + this.gap/2;
+      const hitX = (px+6 > p.x && px-6 < p.x+w);
+      if(hitX){
+        if(py-6 < topH || py+6 > botY){ this.dead=true; return; }
+      }
+      if(!p.passed && p.x + w < px){
+        p.passed = true;
+        this.score += 1;
+      }
+    }
+  },
+  draw(){
+    clearBG();
+    for(const p of this.pipes){
+      const w=22;
+      const topH = p.mid - this.gap/2;
+      const botY = p.mid + this.gap/2;
+      ctx.fillStyle = P.soft;
+      ctx.fillRect(p.x, 22, w, topH-22);
+      ctx.fillRect(p.x, botY, w, H-botY-2);
+      ctx.strokeStyle = 'rgba(58,15,34,.07)';
+      ctx.strokeRect(p.x+0.5, 22.5, w-1, topH-22-1);
+      ctx.strokeRect(p.x+0.5, botY+0.5, w-1, H-botY-3);
+    }
+    drawHeart(this.player.x-8, this.player.y-10, 2, P.hot);
+
+    if(this.dead){
+      ctx.fillStyle = 'rgba(255,255,255,.84)';
+      ctx.fillRect(54, 90, W-108, 60);
+      ctx.strokeStyle = P.line;
+      ctx.strokeRect(54, 90, W-108, 60);
+      pixelText('press R', 108, 114, 14, P.ink);
+    }
+  }
+};
+
+/* runtime */
+let current = null;
+let bestById = {};
+let running = false;
+let last = 0;
+let acc = 0;
+
+function setGame(gameId){
+  current = Games[gameId];
+  current.init();
+  updateUI();
+}
+
+function updateUI(){
+  if(!current) return;
+  hudLeft.innerHTML = `Game: <b>${current.name}</b>`;
+  const best = bestById[current.id] ?? 0;
+  hudRight.innerHTML = `Score: <b>${current.score||0}</b> · Best: <b>${best}</b>`;
+  helpText.innerHTML = current.help;
+
+  [...tabsEl.querySelectorAll('.tab')].forEach(t=>{
+    t.classList.toggle('active', t.dataset.id === current.id);
+  });
+}
+
+function restartGame(){
+  if(!current) return;
+  current.init();
+  updateUI();
+}
+
+function loop(ts){
+  if(!running) return;
+  if(!last) last = ts;
+  const dt = (ts - last)/1000;
+  last = ts;
+
+  acc += dt;
+  const step = 1/60;
+  while(acc >= step){
+    acc -= step;
+    if(current){
+      current.tick(step);
+      const s = current.score || 0;
+      bestById[current.id] = Math.max(bestById[current.id] || 0, s);
+    }
+  }
+
+  if(current){
+    current.draw();
+    updateUI();
+  }
+  requestAnimationFrame(loop);
+}
+
+function startArcade(){
+  tabsEl.innerHTML = '';
+  const order = [
+    ['snake','snake'],
+    ['breakout','Breakout'],
+    ['pong','Pong'],
+    ['invaders','Space Invaders'],
+    ['flappy','Flappy Bird']
+  ];
+
+  order.forEach(([id,label])=>{
+    const btn = document.createElement('button');
+    btn.className = 'tab';
+    btn.textContent = label;
+    btn.dataset.id = id;
+    btn.addEventListener('click', () => setGame(id));
+    tabsEl.appendChild(btn);
+  });
+
+  window.addEventListener('keydown', (e) => {
+    if(!current) return;
+    if(e.key.toLowerCase()==='r'){ restartGame(); return; }
+    if(current.id==='flappy' && e.key===' '){ current.onKey(e); return; }
+    if(current.onKey) current.onKey(e, true);
+  });
+
+  window.addEventListener('keyup', (e) => {
+    if(!current) return;
+    if(current.onKey) current.onKey(e, false);
+  });
+
+  canvas.addEventListener('pointerdown', () => {
+    if(current && current.id==='flappy') current.onClick();
+  });
+
+  restartBtn.addEventListener('click', restartGame);
+
+  setGame('snake');
+  running = true;
+  requestAnimationFrame(loop);
+}
+
+applyScales();
+</script>
+</body>
+</html>
